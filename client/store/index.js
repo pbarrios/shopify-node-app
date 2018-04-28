@@ -2,81 +2,77 @@ import { createStore, applyMiddleware } from 'redux';
 import thunkMiddleware from 'redux-thunk';
 import logger from 'redux-logger';
 
-const requestFields = {
-  verb: 'POST',
-  path: '/products.json',
-  params: JSON.stringify({
-    product: {
-      title: "Burton Custom Freestyle 151",
-      body_html: "<strong>Good snowboard!<\/strong>",
-      vendor: "Burton",
-      product_type: "Snowboard"
-    }
-  }, null, 2)
-};
-
 const initState = {
-  requestFields,
-  requestInProgress: false,
-  requestError: null,
-  responseBody: '',
+  currentView: window.dopplerImportCompleted ? 4 : (window.dopplerListId ? 3 : (window.dopplerAccountName ? 2 : 0)),
+  dopplerAccountName: window.dopplerAccountName,
+  dopplerListId: window.dopplerListId,
+  
+  isConnectingdopplerAccount: false,
+  dopplerAccountConnectedError: null,
+  
+  isSynchronizingList: false,
+  dopplerListSelectedError: null,
+  
+  isRetrievingDopplerLists: false,
+  dopplerLists: [],
+
+  importDetails: null
 };
 
 function reducer(state = initState, action) {
   switch (action.type) {
-    case 'UPDATE_VERB':
+    case 'CHANGE_CURRENT_VIEW':
       return {
         ...state,
-        responseBody: '',
-        requestFields: {
-          ...state.requestFields,
-          verb: action.payload.verb,
-        },
+        currentView: action.payload.currentView
       };
-    case 'UPDATE_PATH':
+    case 'START_DOPPLER_ACCOUNT_CONNECTION':
       return {
         ...state,
-        responseBody: '',
-        requestFields: {
-          ...state.requestFields,
-          path: action.payload.path,
-        },
+        dopplerAccountConnectedError: null,
+        isConnectingdopplerAccount: true
+    };
+    case 'DOPPLER_ACCOUNT_CONNECTION_FINISHED':
+      return {
+        ...state,
+        dopplerAccountConnectedError: action.payload.dopplerAccountConnectedError,
+        isConnectingdopplerAccount: false
       };
-    case 'UPDATE_PARAMS':
+    case 'START_RETRIEVING_DOPPLER_LISTS':
       return {
         ...state,
-        responseBody: '',
-        requestFields: {
-          ...state.requestFields,
-          params: action.payload.params,
-        },
+        isRetrievingDopplerLists: true,
+        dopplerLists: []
       };
-    case 'REQUEST_START':
+    case 'DOPPLER_LISTS_RETRIEVED':
       return {
         ...state,
-        requestInProgress: true,
-        requestError: null,
-        responseBody: ''
+        isRetrievingDopplerLists: false,
+        dopplerLists: action.payload.dopplerLists
       };
-    case 'REQUEST_COMPLETE':
+    case 'START_LIST_SYNCHRONIZATION':
       return {
         ...state,
-        requestInProgress: false,
-        requestError: null,
-        responseBody: action.payload.responseBody
+        dopplerListSynchronizationError: null,
+        isSynchronizingList: true
       };
-    case 'REQUEST_ERROR':
+    case 'DOPPLER_LIST_SYNCHRONIZED':
       return {
         ...state,
-        requestInProgress: false,
-        requestError: action.payload.requestError,
+        dopplerListSynchronizationError: action.payload.dopplerListSynchronizationError,
+        isSynchronizingList: false
+      };
+      case 'IMPORT_DETAILS_RETRIEVED':
+      return {
+        ...state,
+        importDetails: action.payload.importDetails
       };
     default:
       return state;
   }
 }
 
-const middleware = applyMiddleware(thunkMiddleware, logger);
+const middleware = applyMiddleware(thunkMiddleware/*, logger*/);
 
 const store = createStore(reducer, middleware);
 

@@ -11,10 +11,13 @@
     <script>
       window.apiKey = "<%= apiKey %>"
       window.shopOrigin = "https://<%= shop %>"
+      window.dopplerAccountName = "<%= dopplerAccountName %>"
+      window.dopplerListId = <%= dopplerListId %>
+      window.dopplerImportCompleted = <%= dopplerImportCompleted %>
 
       const shopifyAppConfig = {
         apiKey: window.apiKey,
-        shopOrigin: window.shopOrigin,
+        shopOrigin: window.shopOrigin
       }
 
       // This will allow you to access the app outside of the Shopify

@@ -58,7 +58,7 @@ module.exports = {
         exclude: /node_modules/,
         loaders: [
           {
-            loader: 'style-loader',
+            loader: 'style-loader'
           },
           {
             loader: 'css-loader',
@@ -96,6 +96,10 @@ module.exports = {
           },
         ],
       },
+      {
+         test: /\.(png|svg|jpg|gif)$/,
+         use: ['file-loader']
+      }
     ],
   },
 };
